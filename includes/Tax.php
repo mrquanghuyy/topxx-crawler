@@ -168,8 +168,18 @@ function ophim_thongtin_save($post_id)
         foreach ($post as $key => $p) {
             update_post_meta($post_id, $key, $p);
         }
-        return $post_id;
     }
+
+    if (isset($_POST['ophim_preview_images'])) {
+        $raw = $_POST['ophim_preview_images'];
+        $clean = array_values(array_filter(array_map('esc_url_raw', (array) $raw)));
+        $clean = array_slice($clean, 0, 6);
+        update_post_meta($post_id, 'ophim_preview_images', $clean);
+    } else {
+        update_post_meta($post_id, 'ophim_preview_images', array());
+    }
+
+    return $post_id;
 }
 
 add_action('save_post', 'ophim_thongtin_save');
