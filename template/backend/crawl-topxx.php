@@ -203,12 +203,12 @@ $tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
                         <div id="crawl_movies" class="primary">Crawl Movies</div>
 
                         <div style="display: none;" id="result_success" class="notice notice-success">
-                            <p>Crawl Thành Công</p>
+                            <p><strong>Phim mới (thành công)</strong> — chỉ các bộ vừa được tạo bài mới trên site.</p>
                             <textarea style="width: 100%" rows="10" id="list_crawl_success"></textarea>
                         </div>
 
                         <div style="display: none;" id="result_error" class="notice notice-error">
-                            <p>Crawl Lỗi</p>
+                            <p><strong>Bỏ qua / đã có / lỗi</strong> — phim đã tồn tại (không đổi hoặc đã cập nhật), thể loại loại trừ, hoặc lỗi kết nối/API.</p>
                             <textarea style="width: 100%" rows="10" id="list_crawl_error"></textarea>
                         </div>
                     </div>
