@@ -51,7 +51,7 @@ function crawl_topxx_page_handle($url, $language = 'vi')
                 }
             }
 
-            array_push($listMovies, "https://topxx.vip/api/v1/movies/{$item->code}|{$item->code}|{$item->updated_at}|{$title}|{$slug}|{$language}");
+            array_push($listMovies, API_DOMAIN . "/movies/{$item->code}|{$item->code}|{$item->updated_at}|{$title}|{$slug}|{$language}");
         }
         return join("\n", $listMovies);
     }
@@ -205,7 +205,7 @@ function crawl_topxx_movies_handle($url, $code, $updated_at, $slug, $language, $
                 wp_update_post( $updatepost );
 
                 // Check & Update Image
-                $crawl_settings = json_decode(get_option(CRAWL_OPHIM_OPTION_SETTINGS, false));
+                $crawl_settings = json_decode(get_option(CRAWL_TOPXX_OPTION_SETTINGS, false));
                 $ophim_thumb_url = get_post_meta($post_id, 'ophim_thumb_url', true);
                 $ophim_poster_url = get_post_meta($post_id, 'ophim_poster_url', true);
                 if(!file_exists(ABSPATH . $ophim_thumb_url)) {
@@ -587,7 +587,7 @@ function add_posts_topxx($data)
     $post_id = wp_insert_post($post_data);
 
     // Download & resize image
-    $crawl_settings = json_decode(get_option(CRAWL_OPHIM_OPTION_SETTINGS, false));
+    $crawl_settings = json_decode(get_option(CRAWL_TOPXX_OPTION_SETTINGS, false));
     $thumb_image_url = download_resize_thumb_topxx($data, $post_id, $crawl_settings);
     $poster_image_url = download_resize_poster_topxx($data, $post_id, $crawl_settings);
 
