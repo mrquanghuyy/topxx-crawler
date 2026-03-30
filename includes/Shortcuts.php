@@ -45,6 +45,53 @@ function op_get_rating_count()
     return $count;
 }
 
+function op_format_vote_count($count)
+{
+    $count = (int) $count;
+    if ($count >= 1000000000) {
+        $formatted = round($count / 1000000000, 1);
+        return ($formatted == (int)$formatted ? (int)$formatted : $formatted) . 'B';
+    } elseif ($count >= 1000000) {
+        $formatted = round($count / 1000000, 1);
+        return ($formatted == (int)$formatted ? (int)$formatted : $formatted) . 'M';
+    } elseif ($count >= 1000) {
+        $formatted = round($count / 1000, 1);
+        return ($formatted == (int)$formatted ? (int)$formatted : $formatted) . 'K';
+    }
+    return $count;
+}
+
+/**
+ * Số like ước tính theo: like ~= ophim_rating(0..1) * ophim_votes.
+ */
+function op_get_like_count()
+{
+    $votes = (int) get_post_meta(get_the_ID(), 'ophim_votes', true);
+    $rating = get_post_meta(get_the_ID(), 'ophim_rating', true);
+    $rating = $rating !== '' && $rating !== null ? (float) $rating : 0.0;
+
+    $like_count = (int) round($votes * $rating);
+    $like_count = max(0, min($votes, $like_count));
+
+    return op_format_vote_count($like_count);
+}
+
+/**
+ * Số dislike ước tính theo: dislike = ophim_votes - like_count.
+ */
+function op_get_dislike_count()
+{
+    $votes = (int) get_post_meta(get_the_ID(), 'ophim_votes', true);
+    $rating = get_post_meta(get_the_ID(), 'ophim_rating', true);
+    $rating = $rating !== '' && $rating !== null ? (float) $rating : 0.0;
+
+    $like_count = (int) round($votes * $rating);
+    $like_count = max(0, min($votes, $like_count));
+    $dislike_count = $votes - $like_count;
+
+    return op_format_vote_count($dislike_count);
+}
+
 function op_get_meta($name)
 {
     $data = get_post_meta(get_the_ID(), 'ophim_' . $name, true);
