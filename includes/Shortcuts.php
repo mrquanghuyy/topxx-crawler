@@ -61,35 +61,59 @@ function op_format_vote_count($count)
     return $count;
 }
 
-/**
- * Số like ước tính theo: like ~= ophim_rating(0..1) * ophim_votes.
- */
-function op_get_like_count()
+function op_get_vote_breakdown()
 {
     $votes = (int) get_post_meta(get_the_ID(), 'ophim_votes', true);
     $rating = get_post_meta(get_the_ID(), 'ophim_rating', true);
     $rating = $rating !== '' && $rating !== null ? (float) $rating : 0.0;
+    $rating = max(0.0, min(1.0, $rating));
 
     $like_count = (int) round($votes * $rating);
     $like_count = max(0, min($votes, $like_count));
+    $dislike_count = max(0, $votes - $like_count);
+    $total_votes = $like_count + $dislike_count;
 
-    return op_format_vote_count($like_count);
+    // Mặc định chưa có vote sẽ hiển thị 100% like.
+    $like_percent = $total_votes > 0 ? (int) round(($like_count / $total_votes) * 100) : 100;
+    $dislike_percent = max(0, 100 - $like_percent);
+
+    return array(
+        'likes' => $like_count,
+        'dislikes' => $dislike_count,
+        'total' => $total_votes,
+        'like_percent' => $like_percent,
+        'dislike_percent' => $dislike_percent,
+    );
 }
 
 /**
- * Số dislike ước tính theo: dislike = ophim_votes - like_count.
+ * Trả về % like (0..100), dùng để hiển thị "xx%".
+ */
+function op_get_like_count()
+{
+    $stats = op_get_vote_breakdown();
+    return $stats['like_percent'];
+}
+
+/**
+ * Trả về % dislike (0..100).
  */
 function op_get_dislike_count()
 {
-    $votes = (int) get_post_meta(get_the_ID(), 'ophim_votes', true);
-    $rating = get_post_meta(get_the_ID(), 'ophim_rating', true);
-    $rating = $rating !== '' && $rating !== null ? (float) $rating : 0.0;
+    $stats = op_get_vote_breakdown();
+    return $stats['dislike_percent'];
+}
 
-    $like_count = (int) round($votes * $rating);
-    $like_count = max(0, min($votes, $like_count));
-    $dislike_count = $votes - $like_count;
+function op_get_like_vote_count()
+{
+    $stats = op_get_vote_breakdown();
+    return op_format_vote_count($stats['likes']);
+}
 
-    return op_format_vote_count($dislike_count);
+function op_get_dislike_vote_count()
+{
+    $stats = op_get_vote_breakdown();
+    return op_format_vote_count($stats['dislikes']);
 }
 
 function op_get_meta($name)
